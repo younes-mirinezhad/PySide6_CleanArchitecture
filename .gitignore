@@ -1,2 +1,6 @@
 PySide6_CleanArchitecture.pyproject.user
 data.db
+Plugins/__*
+Plugins/Tools/__*
+Plugins/Dashboard/__*
+Core/Database/__*
