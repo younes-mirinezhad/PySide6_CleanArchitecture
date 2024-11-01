@@ -1,20 +1,13 @@
 {
-"files":
-    [
-    "main.py",
-    "main.qml",
-    "Icons/logo.png",
-    "Core/Database/Database.py",
-    "Core/MenuBar.qml",
-    "Core/Controls/IconButton.qml",
-    "Core/Controls/Pane.qml",
-    "Core/Controls/MessageDialog.qml",
-    "Plugins/PluginLoader.py",
-    "Plugins/Tools/Tools.py",
-    "Plugins/Tools/tools.png",
-    "Plugins/Tools/Tools.qml",
-    "Plugins/Dashboard/Dashboard.py",
-    "Plugins/Dashboard/Dashboard.png",
-    "Plugins/Dashboard/Dashboard.qml"
+    "files": [
+        "Icons/logo.png",
+        "Plugins/Dashboard/Dashboard.png",
+        "Plugins/Dashboard/Dashboard.py",
+        "Plugins/Dashboard/Dashboard.qml",
+        "Plugins/Tools/Tools.png",
+        "Plugins/Tools/Tools.py",
+        "Plugins/Tools/Tools.qml",
+        "main.py",
+        "main.qml"
     ]
 }

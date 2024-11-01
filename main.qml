@@ -1,46 +1,69 @@
-import QtQuick 2.15
-import QtQuick.Controls.Material 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import "./Core"
-import core.PluginLoader 1.0
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
 
-ApplicationWindow {
+Window {
     id: root
     visible: true
-    Material.theme: Material.Dark
-    Material.accent: Material.Red
     width: 1280
     height: 720
-    title: qsTr("CrowNet")
+    title: qsTr("PySide6")
 
-    Plugins { id: pluginLoader }
+    property string currentPage: ""
+    onCurrentPageChanged: { loader_content.source = currentPage }
+    Component.onCompleted: {}
 
-    Item {
-        id: mainItm
+    SplitView {
         anchors.fill: parent
+        orientation: Qt.Horizontal
 
-        MenuBar {
-            id: leftMenue
-            width: 40
-            anchors {
-                top: mainItm.top
-                bottom: mainItm.bottom
-                left: mainItm.left
-                margins: 2
+        Pane {
+            id: pluginsItem
+            SplitView.preferredWidth: 40
+            SplitView.minimumWidth: 40
+            SplitView.maximumWidth: 60
+            SplitView.fillHeight: true
+            padding: 5
+
+            ListView {
+                id: pluginListView
+                anchors.fill: parent
+                model: pluginsList
+                spacing: 5
+
+                delegate: Item {
+                    width: pluginListView.width
+                    height: width
+
+                    Button {
+                        width: parent.width
+                        height: parent.height
+                        anchors.centerIn: parent
+                        ToolTip.text: modelData.name
+
+                        background: Rectangle {
+                            radius: parent.width/4
+                            Image {
+                                source: modelData.iconUrl
+                                fillMode: Image.PreserveAspectCrop
+                                anchors.fill: parent
+                            }
+                        }
+
+                        onHoveredChanged: ToolTip.visible = hovered
+                        onClicked: root.currentPage = modelData.uiUrl
+                        Component.onCompleted: {
+                            if (root.currentPage == "")
+                                root.currentPage = modelData.uiUrl
+                        }
+                    }
+                }
             }
-            pagesList: pluginLoader.pluginsList
-            onSelectedPageChanged: page_Loader.source = selectedPage
         }
         Loader {
-            id: page_Loader
-            anchors {
-                top: mainItm.top
-                bottom: mainItm.bottom
-                left: leftMenue.right
-                right: mainItm.right
-                margins: 2
-            }
+            id: loader_content
+            SplitView.fillWidth: true
+            SplitView.fillHeight: true
         }
     }
 }
