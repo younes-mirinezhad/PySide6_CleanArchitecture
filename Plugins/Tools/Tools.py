@@ -7,3 +7,7 @@ class Tools(QObject):
         self.uiUrl = "Tools.qml"
         self.iconUrl = "Tools.png"
         self.order = 100
+
+    @Slot()
+    def testFunc(self):
+        print("----------> Tools test pass")

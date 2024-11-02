@@ -7,3 +7,7 @@ class Dashboard(QObject):
         self.uiUrl = "Dashboard.qml"
         self.iconUrl = "Dashboard.png"
         self.order = 1
+
+    @Slot()
+    def testFunc(self):
+        print("----------> Dashboard test pass")

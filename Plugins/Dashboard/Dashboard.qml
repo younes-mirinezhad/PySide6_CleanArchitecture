@@ -4,6 +4,7 @@ import QtQuick.Controls
 Pane {
     anchors.fill: parent
     padding: 5
+    Component.onCompleted: Dashboard_plugin.testFunc()
 
     Rectangle {
         anchors.fill: parent

@@ -65,6 +65,9 @@ if __name__ == "__main__":
     loader = PluginLoader()
     loader.load_plugins()
     engine.rootContext().setContextProperty("pluginsList", loader.plugins)
+    for p in loader.plugins:
+        pname = p["name"]+"_plugin"
+        engine.rootContext().setContextProperty(pname, p["instance"])
 
     qml_file = Path(__file__).parent / 'main.qml'
     engine.load(qml_file)
