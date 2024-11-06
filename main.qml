@@ -7,11 +7,10 @@ Window {
     visible: true
     width: 1280
     height: 720
-    title: qsTr("PySide6")
+    title: qsTr("Vision")
 
     property string currentPage: ""
     onCurrentPageChanged: { loader_content.source = currentPage }
-    Component.onCompleted: {}
 
     SplitView {
         anchors.fill: parent

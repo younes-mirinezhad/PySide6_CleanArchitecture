@@ -1,12 +1,25 @@
 {
     "files": [
+        "Components/ViewPort/ViewPort.py",
         "Icons/logo.png",
+        "Libs/Common/Common.py",
+        "Libs/Streamer/AbstractStreamer.py",
+        "Libs/Streamer/VideoFileReader.py",
         "Plugins/Dashboard/Dashboard.png",
         "Plugins/Dashboard/Dashboard.py",
         "Plugins/Dashboard/Dashboard.qml",
         "Plugins/Tools/Tools.png",
         "Plugins/Tools/Tools.py",
         "Plugins/Tools/Tools.qml",
+        "Plugins/VideoPlayer/Icons/FastForward.png",
+        "Plugins/VideoPlayer/Icons/FastRewind.png",
+        "Plugins/VideoPlayer/Icons/Pause.png",
+        "Plugins/VideoPlayer/Icons/Play.png",
+        "Plugins/VideoPlayer/Icons/Stop.png",
+        "Plugins/VideoPlayer/Icons/VideoFile.png",
+        "Plugins/VideoPlayer/VideoPlayer.png",
+        "Plugins/VideoPlayer/VideoPlayer.py",
+        "Plugins/VideoPlayer/VideoPlayer.qml",
         "main.py",
         "main.qml"
     ]

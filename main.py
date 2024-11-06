@@ -2,72 +2,105 @@
 import sys, os, importlib
 from pathlib import Path
 from PySide6.QtGui import QGuiApplication, QIcon
-from PySide6.QtQml import QQmlApplicationEngine
-from PySide6.QtCore import QObject, Slot
+from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType
+from PySide6.QtCore import QObject
+
+sys.path.append(os.path.join(os.path.dirname(__file__), 'Libs'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'Plugins'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'Components'))
 
 class PluginLoader(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._plugins_folderName = "Plugins"
         self.plugins = []
+        self.components = []
 
-    def load_plugins(self):
+    def loadFolderContents(self, folderName) -> list:
+        classList = []
         appFolder = os.path.dirname(os.path.abspath(__file__))
-        plugins_folderPath = appFolder + "/" + self._plugins_folderName
-        if not os.path.isdir(plugins_folderPath):
-            return
+        fullPath = appFolder + "/" + folderName
+        if not os.path.isdir(fullPath): 
+            return classList
 
-        pluginList = []
-        for plugin_name in os.listdir(plugins_folderPath):
-            folder_path = os.path.join(plugins_folderPath, plugin_name)
-            if not os.path.isdir(folder_path):
+        for className in os.listdir(fullPath):
+            folder_path = os.path.join(fullPath, className)
+            if not os.path.isdir(folder_path): 
                 continue
-
-            plugin_path = os.path.join(folder_path, plugin_name+".py")
-            if not os.path.isfile(plugin_path):
+            
+            filePath = os.path.join(folder_path, className+".py")
+            if not os.path.isfile(filePath):
                 continue
 
             try:
-                spec = importlib.util.spec_from_file_location(plugin_name, plugin_path)
+                spec = importlib.util.spec_from_file_location(className, filePath)
                 if spec is None:
-                    print(f"***** Failed to load {plugin_name}")
+                    print(f"***** Failed to load {className}")
                     continue
 
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-                if not hasattr(module, plugin_name):
-                    print(f"***** Failed to find class {plugin_name} in {plugin_path}")
+                thisModule = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(thisModule)
+                if not hasattr(thisModule, className):
+                    print(f"***** Failed to find class {className} in {filePath}")
                     continue
 
-                plugin_class = getattr(module, plugin_name)
-                plugin_instance = plugin_class()
+                thisClass = getattr(thisModule, className)
 
-                pIthem = {
-                "name": plugin_instance.name,
-                "uiUrl": os.path.join(folder_path , plugin_instance.uiUrl),
-                "iconUrl": os.path.join(folder_path , plugin_instance.iconUrl),
-                "instance": plugin_instance
-                }
-                pluginList.append(pIthem)
-                print(f"----- {plugin_instance.name} loads successfully")
+                classList.append({"name":className, 
+                                  "class":thisClass, 
+                                  "filePath":filePath, 
+                                  "rootPath":folder_path})
             except Exception as e:
-                print(f"***** Failed to load {plugin_name} {e}")
+                print(f"***** Failed to load {className} : {e}")
+        
+        return classList
+
+    def load_plugins(self, folderName):
+        classList = self.loadFolderContents(folderName)
+
+        pluginList = []
+        for cls in classList:
+            plugin_class = cls["class"]
+            plugin_instance = plugin_class()
+
+            pItem = {"name": cls["name"],
+                     "uiUrl": os.path.join(cls["rootPath"] , plugin_instance.uiUrl),
+                     "iconUrl": os.path.join(cls["rootPath"] , plugin_instance.iconUrl),
+                     "class": plugin_class,
+                     "instance": plugin_instance}
+            pluginList.append(pItem)
+            print(f"-----> plugin ", {cls["name"]}, " loads successfully")
 
         self.plugins = sorted(pluginList, key=lambda x: x["instance"].order)
 
+    def load_components(self, folderName):
+        classList = self.loadFolderContents(folderName)
+
+        for cls in classList:
+            component_class = cls["class"]
+
+            cItem = {"name": cls["name"],
+                     "class": component_class}
+            self.components.append(cItem)
+            print(f"-----> component ", {cls["name"]}, " loads successfully")
+
 if __name__ == "__main__":
-    QGuiApplication.setApplicationName("PySide6")
+    QGuiApplication.setApplicationName("Vision")
     QGuiApplication.setOrganizationName("ParsAI")
 
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
 
     loader = PluginLoader()
-    loader.load_plugins()
+
+    loader.load_plugins("Plugins")
     engine.rootContext().setContextProperty("pluginsList", loader.plugins)
     for p in loader.plugins:
-        pname = p["name"]+"_plugin"
+        pname = p["name"]+"_Plugin"
         engine.rootContext().setContextProperty(pname, p["instance"])
+
+    loader.load_components("Components")
+    for c in loader.components:
+        qmlRegisterType(c["class"], c["name"] + "Module", 1, 0, c["name"])
 
     qml_file = Path(__file__).parent / 'main.qml'
     engine.load(qml_file)

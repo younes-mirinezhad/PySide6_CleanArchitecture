@@ -4,10 +4,9 @@ import QtQuick.Controls
 Pane {
     anchors.fill: parent
     padding: 5
-    Component.onCompleted: Tools_plugin.testFunc();
 
-    Rectangle {
-        anchors.fill: parent
-        color: "red"
+    Connections {
+        target: Qt.application
+        function onAboutToQuit() { Tools_Plugin.exit() }
     }
 }
