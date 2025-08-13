@@ -1,15 +1,17 @@
-# This Python file uses the following encoding: utf-8
-from Libs.Common import Common
+import logging
 from Libs.Streamer.AbstractStreamer import AbstractStreamer
 import cv2
+
+# Get logger instance
+logger = logging.getLogger(__name__)
 
 class VideoFileReader(AbstractStreamer):
     def __init__(self) -> None:
         super().__init__()
-        print(Common.func_info())
+        logger.debug("")
 
     def init(self):
-        print(Common.func_info())
+        logger.info("")
 
         self._cap = cv2.VideoCapture(self._streamerPath)
 
@@ -18,8 +20,6 @@ class VideoFileReader(AbstractStreamer):
         
         self._fps = round(self._cap.get(cv2.CAP_PROP_FPS))
         self._framesCount = round(self._cap.get(cv2.CAP_PROP_FRAME_COUNT))
-
-        print(f"{Common.func_info()} -----> FPS: {self._fps}, Frames count: {self._framesCount}")
 
         self.setIsInited(True)
 

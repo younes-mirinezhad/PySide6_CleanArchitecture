@@ -1,7 +1,10 @@
+import logging
 from PySide6.QtCore import QObject, Signal, Slot, Property
-from Libs.Common import Common
 from Libs.Streamer.VideoFileReader import VideoFileReader
 import threading
+
+# Get logger instance
+logger = logging.getLogger(__name__)
 
 class VideoPlayer(QObject):
     framesCount_changed = Signal()
@@ -9,16 +12,16 @@ class VideoPlayer(QObject):
     frameNumber_changed = Signal()
 
     def __init__(self) -> None:
-        print(Common.func_info())
         super().__init__()
+        logger.debug("")
         self.name = "VideoPlayer"
         self.uiUrl = "VideoPlayer.qml"
         self.iconUrl = "VideoPlayer.png"
         self.order = 2
 
-        self._viewPort = None
+        self.viewPort = None
         self._streamerPath = None
-        self._streamer = None
+        self.streamer = None
         self._framesCount = 0
         self._playbackStatus = False
         self._timeInterval = 0
@@ -26,35 +29,38 @@ class VideoPlayer(QObject):
 
     @Slot()
     def exit(self):
-        print(Common.func_info())
+        logger.debug("")
+
         self._timeInterval = 0
-        if self._streamer:
-            self._streamer.exit()
+        if self.streamer:
+            self.streamer.exit()
 
     @Slot(QObject)
     def setViewPort(self, viewPortObj):
-        print(Common.func_info())
+        logger.debug("")
 
-        self._viewPort = viewPortObj
+        self.viewPort = viewPortObj
 
     @Slot(str)
     def setStreamerPath(self, newPath):
-        print(f"{Common.func_info()} -----> Path: {newPath}")
+        logger.info(f"StreamerPath: {newPath}")
 
         self._streamerPath = newPath
 
     @Slot()
     def init(self):
-        print(Common.func_info())
+        logger.info("")
 
         vfr = VideoFileReader()
         vfr.setStreamerPath(self._streamerPath)
         vfr.init()
-        self.set_framesCount(vfr.framesCount())
+        self.framesCount = vfr.framesCount()
 
-        self._streamer = vfr
+        self.streamer = vfr
 
     def set_framesCount(self, fCount):
+        logger.info(f"framesCount: {fCount}")
+
         self._framesCount = fCount
         self.framesCount_changed.emit()
     def get_framesCount(self):
@@ -63,26 +69,25 @@ class VideoPlayer(QObject):
 
     @Slot()
     def changeStreamerStatus(self):
-        if not self._streamer:
-            print(f"{Common.func_info()} -----> Streamer is not inited.")
+        logger.debug("")
+
+        if not self.streamer:
             return
-        if not self._streamer.isInited():
-            print(f"{Common.func_info()} -----> Streamer is not inited.")
+        if not self.streamer.isInited():
             return
-        print(Common.func_info())
 
         self.playbackStatus = not self._playbackStatus
 
         if self._playbackStatus:
-            self._streamer.start_thread()
-            self._timeInterval = 1 / self._streamer.fps()
+            self.streamer.start_thread()
+            self._timeInterval = 1 / self.streamer.fps()
             threading.Timer(self._timeInterval, self.readFrames).start()
         else:
-            self._streamer.stop_thread()
+            self.streamer.stop_thread()
             self._timeInterval = 0
     
     def set_playbackStatus(self, status):
-        print(f"{Common.func_info()} -----> status: {status}")
+        logger.debug("")
 
         self._playbackStatus = status
         self.playbackStatus_changed.emit()
@@ -92,12 +97,14 @@ class VideoPlayer(QObject):
 
     def readFrames(self):
         if self._timeInterval > 0:
-            fNum, f = self._streamer.retrieveFrame()
-            self._viewPort.setNewFrame(f)
+            fNum, f = self.streamer.retrieveFrame()
+            self.viewPort.setNewFrame(f)
             self.frameNumber = fNum
             threading.Timer(self._timeInterval, self.readFrames).start()
     
     def set_frameNumber(self, fNum):
+        logger.debug(f"frameNumber: {fNum}")
+
         self._frameNumber = fNum
         self.frameNumber_changed.emit()
     def get_frameNumber(self):

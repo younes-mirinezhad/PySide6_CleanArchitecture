@@ -1,15 +1,18 @@
-# This Python file uses the following encoding: utf-8
+import logging
 from PySide6.QtQuick import QQuickPaintedItem
 from PySide6.QtGui import QPainter, QImage
 from PySide6.QtCore import QPoint, QMetaObject, Qt
-from Libs.Common import Common
 import cv2
 import numpy as np
 
+# Get logger instance
+logger = logging.getLogger(__name__)
+
 class ViewPort(QQuickPaintedItem):
     def __init__(self):
-        print(Common.func_info())
         super().__init__()
+        logger.debug("")
+
         self.image = np.zeros((10,10,3), dtype=np.uint8)
     
     def setNewFrame(self, image):

@@ -1,10 +1,13 @@
+import logging
 from PySide6.QtCore import QObject, Slot
-from Libs.Common import Common
+
+# Get logger instance
+logger = logging.getLogger(__name__)
 
 class Tools(QObject):
     def __init__(self):
-        print(Common.func_info())
         super().__init__()
+        logger.debug("")
         self.name = "Tools"
         self.uiUrl = "Tools.qml"
         self.iconUrl = "Tools.png"
@@ -12,4 +15,4 @@ class Tools(QObject):
 
     @Slot()
     def exit(self):
-        print(Common.func_info())
+        pass

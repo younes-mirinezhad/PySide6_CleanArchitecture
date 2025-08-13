@@ -1,10 +1,13 @@
+import logging
 from PySide6.QtCore import QObject, Slot
-from Libs.Common import Common
+
+# Get logger instance
+logger = logging.getLogger(__name__)
 
 class Dashboard(QObject):
     def __init__(self):
-        print(Common.func_info())
         super().__init__()
+        logger.debug("")
         self.name = "Dashboard"
         self.uiUrl = "Dashboard.qml"
         self.iconUrl = "Dashboard.png"
@@ -12,4 +15,4 @@ class Dashboard(QObject):
 
     @Slot()
     def exit(self):
-        print(Common.func_info())
+        pass

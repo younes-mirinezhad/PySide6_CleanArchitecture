@@ -1,9 +1,10 @@
-# This Python file uses the following encoding: utf-8
+import logging
 import threading, time
-from Libs.Common import Common
 from abc import ABC, abstractmethod
 import numpy as np
-import cv2
+
+# Get logger instance
+logger = logging.getLogger(__name__)
 
 # Custom decorator to mark a method as final
 def final(method):
@@ -12,7 +13,7 @@ def final(method):
 
 class AbstractStreamer(threading.Thread):
     def __init__(self):
-        print(f"{Common.func_info()} -----> (AbstractStreamer)")
+        logger.debug("")
 
         self._streamerPath = None
         self._cap = None
@@ -25,14 +26,15 @@ class AbstractStreamer(threading.Thread):
         self._frameNumber = -1
     @final
     def exit(self):
-        print(f"{Common.func_info()} -----> (AbstractStreamer)")
+        logger.debug("")
+
         self._isInited = False
         self._playbackStatus = False
         self._cap.release()
 
     @final
     def setStreamerPath(self, newPath):
-        print(f"{Common.func_info()} -----> (AbstractStreamer): {newPath}")
+        logger.info(f"Streamer path: {newPath}")
 
         self._streamerPath = newPath
     @final
@@ -41,7 +43,6 @@ class AbstractStreamer(threading.Thread):
     
     @abstractmethod
     def init(self):
-        print(f"{Common.func_info()} -----> (AbstractStreamer)")
         pass
 
     @final
@@ -54,7 +55,7 @@ class AbstractStreamer(threading.Thread):
 
     @final
     def setIsInited(self, status):
-        print(f"{Common.func_info()} -----> (AbstractStreamer): {status}")
+        logger.debug(f"Status: {status}")
 
         self._isInited = status
         if not status:
@@ -65,29 +66,29 @@ class AbstractStreamer(threading.Thread):
     
     @final
     def start_thread(self):
-        print(f"{Common.func_info()} -----> (AbstractStreamer)")
+        logger.info("")
 
         self._playbackStatus = True
         super().__init__()
         self.start()
     @final
     def stop_thread(self):
-        print(f"{Common.func_info()} -----> (AbstractStreamer)")
+        logger.info("")
 
         self._playbackStatus = False
 
     @final
     def run(self):
         if not self._isInited:
-            print(f"{Common.func_info()} -----> (AbstractStreamer): Streamer is not inited.")
             return
-        print(f"{Common.func_info()} -----> (AbstractStreamer): Streamer thread is started.")
+
+        logger.info("Streaming started")
 
         while self._playbackStatus:
             self.grabFrame()
             time.sleep(0.001) # Sleep for 1 ms
 
-        print(f"{Common.func_info()} -----> (AbstractStreamer): Streamer thread is finished.")
+        logger.info("Streaming stopped")
 
     @abstractmethod
     def grabFrame(self):
